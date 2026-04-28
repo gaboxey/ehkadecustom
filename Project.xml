@@ -85,7 +85,11 @@
 		NOT USING A DIRECT THING TO THE ASSET!!!
 	-->
 	<assets path="assets/fonts" embed='true'/>
+	
 	<!-- _______________________________ Libraries ______________________________ -->
+	
+	<!-- Mobile Library -->
+    <haxelib name="extension-androidtools" if="android"/>
 
 	<haxelib name="flixel" />
 	<haxedev set='webgl' />

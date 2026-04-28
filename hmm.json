@@ -50,6 +50,10 @@
       "type": "haxelib"
     },
     {
+      "name": "extension-androidtools",
+      "type": "haxelib"
+    },
+    {
       "name": "discord_rpc",
       "type": "git",
       "ref": "master",
