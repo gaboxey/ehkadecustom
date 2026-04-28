@@ -2,10 +2,8 @@
   "dependencies": [
     {
       "name": "lime",
-      "type": "git",
-      "dir": null,
-      "ref": "main",
-      "url": "https://github.com/DeveloperPorting-Stuff/LimeFunkinCrew"
+      "type": "haxelib",
+      "version": "8.1.2"
     },
     {
       "name": "openfl",
@@ -33,16 +31,15 @@
       "version": "2.5.0"
     },
     {
-        "name": "hscript",
-        "type": "haxelib",
-        "version": "2.4.0"
-      },
+      "name": "hscript",
+      "type": "haxelib",
+      "version": "2.4.0"
+    },
     {
       "name": "hxcpp",
       "type": "git",
-      "dir": null,
-      "ref": "5932340d095a7eea8635fe4d1355f1c0efd0b3c2",
-      "url": "https://github.com/FunkinCrew/hxcpp"
+      "url": "https://github.com/FunkinCrew/hxcpp",
+      "ref": "5932340d095a7eea8635fe4d1355f1c0efd0b3c2"
     },
     {
       "name": "hxCodec",
@@ -71,9 +68,8 @@
     {
       "name": "extension-androidtools",
       "type": "git",
-      "dir": null,
-      "ref": "main",
-      "url": "https://github.com/MAJigsaw77/extension-androidtools"
+      "url": "https://github.com/MAJigsaw77/extension-androidtools",
+      "ref": "main"
     }
   ]
 }
