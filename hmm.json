@@ -66,13 +66,9 @@
     },
     {
       "name": "extension-androidtools",
-      "type": "haxelib",
-      "version": "1.8.0"
-    },
-    {
-      "name": "extension-haptics",
-      "type": "haxelib",
-      "version": "1.0.0"
+      "type": "git",
+      "url": "https://github.com/MAJigsaw77/extension-androidtools",
+      "ref": "main"
     }
   ]
 }
