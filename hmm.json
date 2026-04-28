@@ -18,17 +18,17 @@
     {
       "name": "flixel",
       "type": "haxelib",
-      "version": "5.2.2"
+      "version": "4.11.0"
     },
     {
       "name": "flixel-addons",
       "type": "haxelib",
-      "version": "3.0.2"
+      "version": "2.11.0"
     },
     {
       "name": "flixel-ui",
       "type": "haxelib",
-      "version": "2.6.0"
+      "version": "2.6.1"
     },
     {
         "name": "hscript",
@@ -51,8 +51,7 @@
     },
     {
       "name": "extension-androidtools",
-      "type": "haxelib",
-      "version": "2.3.0"
+      "type": "haxelib"
     },
     {
       "name": "discord_rpc",
