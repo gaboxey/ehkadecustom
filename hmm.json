@@ -51,7 +51,8 @@
     },
     {
       "name": "extension-androidtools",
-      "type": "haxelib"
+      "type": "haxelib",
+      "version": "2.2.0"
     },
     {
       "name": "discord_rpc",
