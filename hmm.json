@@ -37,9 +37,8 @@
     },
     {
       "name": "hxcpp",
-      "type": "git",
-      "url": "https://github.com/FunkinCrew/hxcpp",
-      "ref": "5932340d095a7eea8635fe4d1355f1c0efd0b3c2"
+      "type": "haxelib",
+      "version": "4.3.2"
     },
     {
       "name": "hxCodec",
