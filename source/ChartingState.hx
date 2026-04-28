@@ -210,6 +210,14 @@ class ChartingState extends MusicBeatState
 	{
 		var UI_songTitle = new FlxUIInputText(10, 10, 70, _song.song, 8);
 		typingShit = UI_songTitle;
+		
+		#if android
+		UI_songTitle.callback = function(text:String, action:String)
+		{
+			FlxG.stage.window.textInputEnabled = true;
+		};
+		UI_songTitle.hasFocus = false;
+		#end
 
 		var check_voices = new FlxUICheckBox(10, 25, null, null, "Has voice track", 100);
 		check_voices.checked = _song.needsVoices;
