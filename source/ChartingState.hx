@@ -1038,7 +1038,7 @@ class ChartingState extends MusicBeatState
 
 					var daTime:Float = 700 * FlxG.elapsed;
 
-					if (FlxG.keys.pressed.W)
+					if (FlxG.keys.pressed.W #if mobile || vPad.buttonUp.pressed #end)
 					{
 						FlxG.sound.music.time -= daTime;
 					}
@@ -1050,14 +1050,14 @@ class ChartingState extends MusicBeatState
 			}
 			else
 			{
-				if (FlxG.keys.justPressed.W || FlxG.keys.justPressed.S)
+				if (FlxG.keys.justPressed.W #if mobile || vPad.buttonUp.justPressed #end || FlxG.keys.justPressed.S #if mobile || vPad.buttonDown.justPressed #end)
 				{
 					FlxG.sound.music.pause();
 					vocals.pause();
 
 					var daTime:Float = Conductor.stepCrochet * 2;
 
-					if (FlxG.keys.justPressed.W #if mobile || vPad.buttonUp.pressed #end)
+					if (FlxG.keys.justPressed.W #if mobile || vPad.buttonUp.justPressed #end)
 					{
 						FlxG.sound.music.time -= daTime;
 					}
