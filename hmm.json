@@ -51,7 +51,7 @@
     },
     {
       "name": "extension-androidtools",
-      "type": "haxelib"
+      "type": "haxelib",
       "version": "2.3.0"
     },
     {
