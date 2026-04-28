@@ -56,6 +56,17 @@ class Main extends Sprite
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 		}
 
+		// Inicializa o sistema de mods ANTES de tudo
+		try
+		{
+			ModManager.initModSystem();
+			trace("[Main] ModManager inicializado com sucesso!");
+		}
+		catch (e)
+		{
+			trace("[Main] ERRO ao inicializar ModManager: " + e);
+		}
+
 		setupGame();
 	}
 
