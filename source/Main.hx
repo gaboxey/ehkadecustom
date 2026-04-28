@@ -13,6 +13,11 @@ import openfl.display.FPS;
 import openfl.display.Sprite;
 import openfl.events.Event;
 
+#if mobile
+import mobile.util.MobileUtil;
+import openfl.events.UncaughtErrorEvent;
+#end
+
 class Main extends Sprite
 {
 	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
@@ -76,6 +81,17 @@ class Main extends Sprite
 		game = new FlxGame(gameWidth, gameHeight, initialState, #if (flixel < "5.0.0") zoom, #end framerate, framerate, skipSplash, startFullscreen);
 
 		addChild(game);
+		
+		#if mobile
+		MobileUtil.getPermissions();
+		Sys.setCwd(haxe.io.Path.addTrailingSlash(MobileUtil.getDirectory()));
+
+		if (!MobileUtil.areAssetsCopied("assets/"))
+			MobileUtil.copyAssetsFromAPK("assets/");
+
+		if (!MobileUtil.areAssetsCopied("assets/videos/"))
+			MobileUtil.copyAssetsFromAPK("assets/videos/");
+		#end
 		
 		fpsCounter = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsCounter);

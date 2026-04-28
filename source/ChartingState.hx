@@ -200,9 +200,9 @@ class ChartingState extends MusicBeatState
 
 		add(blackBorder);
 		add(snapText);
-
-
-
+		
+		#if mobile addVPad(FULL, A_B_C_X_Y); #end
+		
 		super.create();
 	}
 
@@ -822,6 +822,52 @@ class ChartingState extends MusicBeatState
 		FlxG.watch.addQuick('daBeat', curBeat);
 		FlxG.watch.addQuick('daStep', curStep);
 
+		#if mobile 
+		if (FlxG.mouse.x > gridBG.x
+		    && FlxG.mouse.x < gridBG.x + gridBG.width
+		    && FlxG.mouse.y > gridBG.y
+		    && FlxG.mouse.y < gridBG.y + (GRID_SIZE * _song.notes[curBar].lengthInSteps))
+		{
+		    dummyArrow.x = Math.floor(FlxG.mouse.x / GRID_SIZE) * GRID_SIZE;
+		    if (FlxG.keys.pressed.SHIFT)
+		        dummyArrow.y = FlxG.mouse.y;
+		    else
+		        dummyArrow.y = Math.floor(FlxG.mouse.y / GRID_SIZE) * GRID_SIZE;
+		}
+		
+		if (FlxG.mouse.justPressed)
+		{
+		    if (FlxG.mouse.overlaps(curRenderedNotes))
+		    {
+		        curRenderedNotes.forEach(function(note:Note)
+		        {
+		            if (FlxG.mouse.overlaps(note))
+		            {
+		                if (FlxG.keys.pressed.CONTROL)
+		                {
+		                    selectNote(note);
+		                }
+		                else
+		                {
+		                    trace('tryin to delete note...');
+		                    deleteNote(note);
+		                }
+		            }
+		        });
+		    }
+		    else
+		    {
+		        if (FlxG.mouse.x > gridBG.x
+		            && FlxG.mouse.x < gridBG.x + gridBG.width
+		            && FlxG.mouse.y > gridBG.y
+		            && FlxG.mouse.y < gridBG.y + (GRID_SIZE * _song.notes[curBar].lengthInSteps))
+		        {
+		            FlxG.log.add('added note');
+		            addNote();
+		        }
+		    }
+		}
+		#else
 		if (FlxG.mouse.justPressed)
 		{
 			if (FlxG.mouse.overlaps(curRenderedNotes))
@@ -865,8 +911,9 @@ class ChartingState extends MusicBeatState
 			else
 				dummyArrow.y = Math.floor(FlxG.mouse.y / GRID_SIZE) * GRID_SIZE;
 		}
+		#end
 
-		if (FlxG.keys.justPressed.ENTER)
+		if (FlxG.keys.justPressed.ENTER #if mobile || vPad.buttonA.justPressed #end)
 		{
 			lastSection = curSection;
 
@@ -876,11 +923,11 @@ class ChartingState extends MusicBeatState
 			LoadingState.loadAndSwitchState(new PlayState());
 		}
 
-		if (FlxG.keys.justPressed.E)
+		if (FlxG.keys.justPressed.E #if mobile || vPad.buttonY.justPressed #end)
 		{
 			changeNoteSustain(Conductor.stepCrochet);
 		}
-		if (FlxG.keys.justPressed.Q)
+		if (FlxG.keys.justPressed.Q #if mobile || vPad.buttonX.justPressed #end)
 		{
 			changeNoteSustain(-Conductor.stepCrochet);
 		}
@@ -917,16 +964,16 @@ class ChartingState extends MusicBeatState
 			}
 
 			var shiftThing:Int = 1;
-			if (FlxG.keys.pressed.SHIFT)
+			if (FlxG.keys.pressed.SHIFT #if mobile || vPad.buttonB.pressed #end)
 				shiftThing = 4;
 			if (!FlxG.keys.pressed.CONTROL)
 			{
-				if (FlxG.keys.justPressed.RIGHT || FlxG.keys.justPressed.D)
+				if (FlxG.keys.justPressed.RIGHT #if mobile || vPad.buttonRight.justPressed #end || FlxG.keys.justPressed.D)
 					changeSection(curSection + shiftThing);
-				if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.A)
+				if (FlxG.keys.justPressed.LEFT #if mobile || vPad.buttonRight.justPressed #end || FlxG.keys.justPressed.A)
 					changeSection(curSection - shiftThing);
 			}	
-			if (FlxG.keys.justPressed.SPACE)
+			if (FlxG.keys.justPressed.SPACE #if mobile || vPad.buttonC.justPressed #end)
 			{
 				if (FlxG.sound.music.playing)
 				{
@@ -975,7 +1022,7 @@ class ChartingState extends MusicBeatState
 
 			if (!FlxG.keys.pressed.SHIFT)
 			{
-				if (FlxG.keys.pressed.W || FlxG.keys.pressed.S)
+				if (FlxG.keys.pressed.W #if mobile || vPad.buttonUp.pressed #end || FlxG.keys.pressed.S #if mobile || vPad.buttonDown.pressed #end)
 				{
 					FlxG.sound.music.pause();
 					vocals.pause();
@@ -1002,7 +1049,7 @@ class ChartingState extends MusicBeatState
 
 					var daTime:Float = Conductor.stepCrochet * 2;
 
-					if (FlxG.keys.justPressed.W)
+					if (FlxG.keys.justPressed.W #if mobile || vPad.buttonUp.pressed #end)
 					{
 						FlxG.sound.music.time -= daTime;
 					}
