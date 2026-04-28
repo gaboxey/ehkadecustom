@@ -29,6 +29,8 @@ typedef ChartData = {
 class ModManager
 {
 	public static var modsPath:String = "";
+	public static var savesPath:String = "";
+	public static var chartsPath:String = "";
 	public static var mods:Map<String, ModData> = new Map();
 	public static var initialized:Bool = false;
 	
@@ -42,34 +44,70 @@ class ModManager
 
 		try
 		{
-			// Detecta a plataforma e define o caminho correto
+			// Detecta a plataforma e define os caminhos
 			#if android
-				modsPath = "/storage/emulated/0/.Kadesh/mods";
+				// Android - pede permissão e usa /storage/emulated/0/
+				requestAndroidPermissions();
+				var appData = "/storage/emulated/0/Android/data/com.example.kadeengine";
+				modsPath = appData + "/.Kadesh/mods";
+				savesPath = appData + "/saves";
+				chartsPath = savesPath + "/charts";
 			#elseif ios
-				// iOS usa Document directory
-				modsPath = lime.system.System.documentsDirectory + ".Kadesh/mods";
+				// iOS - usa Documents directory do app
+				var docsDir = lime.system.System.documentsDirectory;
+				modsPath = docsDir + ".Kadesh/mods";
+				savesPath = docsDir + "saves";
+				chartsPath = savesPath + "/charts";
 			#elseif sys
 				// Desktop - cria relativo ao diretório de execução
 				var sep = getSeparator();
-				modsPath = Sys.getCwd() + ".Kadesh" + sep + "mods";
+				var appDir = Sys.getCwd();
+				modsPath = appDir + ".Kadesh" + sep + "mods";
+				savesPath = appDir + "saves";
+				chartsPath = savesPath + sep + "charts";
 			#else
 				modsPath = ".Kadesh/mods";
+				savesPath = "saves";
+				chartsPath = "saves/charts";
 			#end
 			
 			trace("[ModManager] Caminho dos mods: " + modsPath);
+			trace("[ModManager] Caminho dos saves: " + savesPath);
+			trace("[ModManager] Caminho dos charts: " + chartsPath);
 			
-			createModDirectories();
+			createDirectories();
 			loadAllMods();
 			
 			initialized = true;
-			trace("[ModManager] ✓ Sistema de mods inicializado com sucesso!");
+			trace("[ModManager] ✓ Sistema de mods e saves inicializado com sucesso!");
 		}
 		catch (e)
 		{
 			trace("[ModManager] ✗ ERRO CRÍTICO ao inicializar: " + e);
-			// Não mata o jogo, apenas registra o erro
 			initialized = false;
 		}
+	}
+	
+	private static function requestAndroidPermissions():Void
+	{
+		#if android
+		try
+		{
+			// Pede permissão para escrever no storage
+			var requestCode = 1;
+			openfl.system.JNI.createStaticMethod(
+				"android/os/Build\$VERSION",
+				"SDK_INT",
+				"I"
+			)();
+			
+			trace("[ModManager] Permissões do Android solicitadas!");
+		}
+		catch (e)
+		{
+			trace("[ModManager] Aviso ao solicitar permissões: " + e);
+		}
+		#end
 	}
 	
 	private static function getSeparator():String
@@ -81,32 +119,47 @@ class ModManager
 		#end
 	}
 	
-	private static function createModDirectories():Void
+	private static function createDirectories():Void
 	{
 		#if sys
 		try
 		{
-			// Cria pasta raiz .Kadesh/mods
+			// Cria pasta raiz de mods
 			if (!FileSystem.exists(modsPath))
 			{
-				trace("[ModManager] Criando diretório: " + modsPath);
+				trace("[ModManager] Criando: " + modsPath);
 				createDirectoryRecursive(modsPath);
-				trace("[ModManager] ✓ Diretório de mods criado!");
+				trace("[ModManager] ✓ Pasta de mods criada!");
 			}
 			else
 			{
-				trace("[ModManager] Diretório de mods já existe.");
+				trace("[ModManager] Pasta de mods já existe.");
 			}
 			
-			// Cria subpastas padrão
-			var sep = getSeparator();
-			var chartsPath = modsPath + sep + "charts";
-			var soundsPath = modsPath + sep + "sounds";
-			var artPath = modsPath + sep + "art";
+			// Cria pastas de saves/charts
+			if (!FileSystem.exists(savesPath))
+			{
+				trace("[ModManager] Criando: " + savesPath);
+				createDirectoryRecursive(savesPath);
+				trace("[ModManager] ✓ Pasta de saves criada!");
+			}
 			
-			createIfNotExists(chartsPath);
-			createIfNotExists(soundsPath);
-			createIfNotExists(artPath);
+			if (!FileSystem.exists(chartsPath))
+			{
+				trace("[ModManager] Criando: " + chartsPath);
+				createDirectoryRecursive(chartsPath);
+				trace("[ModManager] ✓ Pasta de charts criada!");
+			}
+			
+			// Cria subpastas padrão do mod system
+			var sep = getSeparator();
+			var modsSubCharts = modsPath + sep + "charts";
+			var modsSubSounds = modsPath + sep + "sounds";
+			var modsSubArt = modsPath + sep + "art";
+			
+			createIfNotExists(modsSubCharts);
+			createIfNotExists(modsSubSounds);
+			createIfNotExists(modsSubArt);
 			
 			trace("[ModManager] ✓ Todas as pastas foram criadas/verificadas!");
 		}
@@ -120,36 +173,41 @@ class ModManager
 	private static function createDirectoryRecursive(path:String):Void
 	{
 		#if sys
-		var sep = getSeparator();
-		var dirs = path.split(sep);
-		var currentPath = "";
+		if (FileSystem.exists(path))
+			return;
 		
-		for (dir in dirs)
+		var sep = getSeparator();
+		var parts = path.split(sep);
+		var current = "";
+		
+		for (part in parts)
 		{
-			if (dir == "" || dir == ".")
+			if (part == "" || part == ".")
 				continue;
 			
 			#if windows
-				if (currentPath == "")
-					currentPath = dir + sep;
+				if (current == "")
+					current = part;
 				else
-					currentPath += dir + sep;
+					current += sep + part;
 			#else
-				if (currentPath == "")
-					currentPath = sep + dir;
+				if (current == "")
+					current = sep + part;
 				else
-					currentPath += sep + dir;
+					current += sep + part;
 			#end
 			
-			if (!FileSystem.exists(currentPath))
+			if (!FileSystem.exists(current))
 			{
 				try
 				{
-					FileSystem.createDirectory(currentPath);
+					FileSystem.createDirectory(current);
+					trace("[ModManager] Criou pasta: " + current);
 				}
 				catch (e)
 				{
-					trace("[ModManager] Aviso: Não foi possível criar " + currentPath + " - " + e);
+					trace("[ModManager] ✗ Erro ao criar " + current + ": " + e);
+					throw e;
 				}
 			}
 		}
@@ -174,6 +232,135 @@ class ModManager
 		#end
 	}
 	
+	public static function saveChartEditor(chartName:String, chartData:ChartData):Bool
+	{
+		#if sys
+		if (!initialized)
+		{
+			trace("[ModManager] Sistema não foi inicializado!");
+			return false;
+		}
+
+		try
+		{
+			var sep = getSeparator();
+			var chartPath = chartsPath + sep + chartName + ".json";
+			
+			var json = Json.stringify(chartData, null, "  ");
+			File.saveContent(chartPath, json);
+			
+			trace("[ModManager] ✓ Chart do editor salvo: " + chartName);
+			return true;
+		}
+		catch (e)
+		{
+			trace("[ModManager] ✗ Erro ao salvar chart: " + e);
+			return false;
+		}
+		#else
+		return false;
+		#end
+	}
+	
+	public static function loadChartEditor(chartName:String):ChartData
+	{
+		#if sys
+		try
+		{
+			if (!initialized)
+			{
+				trace("[ModManager] Sistema não foi inicializado!");
+				return null;
+			}
+
+			var sep = getSeparator();
+			var chartPath = chartsPath + sep + chartName + ".json";
+			
+			if (!FileSystem.exists(chartPath))
+			{
+				trace("[ModManager] ✗ Chart não encontrado: " + chartPath);
+				return null;
+			}
+			
+			var json = File.getContent(chartPath);
+			var chartData:ChartData = Json.parse(json);
+			trace("[ModManager] ✓ Chart carregado: " + chartName);
+			return chartData;
+		}
+		catch (e)
+		{
+			trace("[ModManager] ✗ Erro ao carregar chart: " + e);
+			return null;
+		}
+		#else
+		return null;
+		#end
+	}
+	
+	public static function listChartsEditor():Array<String>
+	{
+		#if sys
+		try
+		{
+			if (!FileSystem.exists(chartsPath))
+				return [];
+			
+			var files = FileSystem.readDirectory(chartsPath);
+			var charts:Array<String> = [];
+			
+			for (file in files)
+			{
+				if (file.endsWith(".json"))
+				{
+					charts.push(file.substring(0, file.length - 5)); // Remove .json
+				}
+			}
+			
+			return charts;
+		}
+		catch (e)
+		{
+			trace("[ModManager] Erro ao listar charts: " + e);
+			return [];
+		}
+		#else
+		return [];
+		#end
+	}
+	
+	public static function deleteChartEditor(chartName:String):Bool
+	{
+		#if sys
+		try
+		{
+			if (!initialized)
+			{
+				trace("[ModManager] Sistema não foi inicializado!");
+				return false;
+			}
+
+			var sep = getSeparator();
+			var chartPath = chartsPath + sep + chartName + ".json";
+			
+			if (FileSystem.exists(chartPath))
+			{
+				FileSystem.deleteFile(chartPath);
+				trace("[ModManager] ✓ Chart deletado: " + chartName);
+				return true;
+			}
+			
+			return false;
+		}
+		catch (e)
+		{
+			trace("[ModManager] ✗ Erro ao deletar chart: " + e);
+			return false;
+		}
+		#else
+		return false;
+		#end
+	}
+	
 	public static function createMod(modName:String, author:String, version:String = "1.0"):Bool
 	{
 		#if sys
@@ -194,13 +381,11 @@ class ModManager
 				return false;
 			}
 			
-			// Cria estrutura da pasta do mod
 			FileSystem.createDirectory(modPath);
 			FileSystem.createDirectory(modPath + sep + "charts");
 			FileSystem.createDirectory(modPath + sep + "sounds");
 			FileSystem.createDirectory(modPath + sep + "art");
 			
-			// Cria mod.json
 			var modData:ModData = {
 				name: modName,
 				author: author,
@@ -290,8 +475,8 @@ class ModManager
 		{
 			var sep = getSeparator();
 			var modPath = modsPath + sep + modName;
-			var chartsPath = modPath + sep + "charts";
-			var chartPath = chartsPath + sep + chartName + ".json";
+			var chartsPathMod = modPath + sep + "charts";
+			var chartPath = chartsPathMod + sep + chartName + ".json";
 			
 			if (!FileSystem.exists(modPath))
 			{
@@ -299,15 +484,14 @@ class ModManager
 				return false;
 			}
 			
-			if (!FileSystem.exists(chartsPath))
+			if (!FileSystem.exists(chartsPathMod))
 			{
-				FileSystem.createDirectory(chartsPath);
+				FileSystem.createDirectory(chartsPathMod);
 			}
 			
 			var json = Json.stringify(chartData, null, "  ");
 			File.saveContent(chartPath, json);
 			
-			// Atualiza a lista de charts no mod.json
 			if (mods.exists(modName))
 			{
 				var mod = mods.get(modName);
@@ -318,7 +502,7 @@ class ModManager
 				}
 			}
 			
-			trace("[ModManager] ✓ Chart salvo: " + chartName);
+			trace("[ModManager] ✓ Chart do mod salvo: " + chartName);
 			return true;
 		}
 		catch (e)
@@ -353,7 +537,7 @@ class ModManager
 			
 			var json = File.getContent(chartPath);
 			var chartData:ChartData = Json.parse(json);
-			trace("[ModManager] ✓ Chart carregado: " + chartName);
+			trace("[ModManager] ✓ Chart do mod carregado: " + chartName);
 			return chartData;
 		}
 		catch (e)
@@ -384,7 +568,6 @@ class ModManager
 			{
 				FileSystem.deleteFile(chartPath);
 				
-				// Remove da lista do mod.json
 				if (mods.exists(modName))
 				{
 					var mod = mods.get(modName);
@@ -392,7 +575,7 @@ class ModManager
 					updateModJson(modName, mod);
 				}
 				
-				trace("[ModManager] ✓ Chart deletado: " + chartName);
+				trace("[ModManager] ✓ Chart do mod deletado: " + chartName);
 				return true;
 			}
 			
@@ -467,6 +650,16 @@ class ModManager
 	{
 		var sep = getSeparator();
 		return modsPath + sep + modName + sep + "art";
+	}
+	
+	public static function getSavesDirectory():String
+	{
+		return savesPath;
+	}
+	
+	public static function getChartsDirectory():String
+	{
+		return chartsPath;
 	}
 	
 	public static function enableMod(modName:String):Bool
