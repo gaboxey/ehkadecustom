@@ -50,7 +50,8 @@ class ModManager
 				modsPath = lime.system.System.documentsDirectory + ".Kadesh/mods";
 			#elseif sys
 				// Desktop - cria relativo ao diretório de execução
-				modsPath = Sys.getCwd() + ".Kadesh" + java.nio.file.FileSystems.getDefault().getSeparator() + "mods";
+				var sep = getSeparator();
+				modsPath = Sys.getCwd() + ".Kadesh" + sep + "mods";
 			#else
 				modsPath = ".Kadesh/mods";
 			#end
@@ -71,6 +72,15 @@ class ModManager
 		}
 	}
 	
+	private static function getSeparator():String
+	{
+		#if windows
+			return "\\";
+		#else
+			return "/";
+		#end
+	}
+	
 	private static function createModDirectories():Void
 	{
 		#if sys
@@ -89,9 +99,10 @@ class ModManager
 			}
 			
 			// Cria subpastas padrão
-			var chartsPath = modsPath + java.nio.file.FileSystems.getDefault().getSeparator() + "charts";
-			var soundsPath = modsPath + java.nio.file.FileSystems.getDefault().getSeparator() + "sounds";
-			var artPath = modsPath + java.nio.file.FileSystems.getDefault().getSeparator() + "art";
+			var sep = getSeparator();
+			var chartsPath = modsPath + sep + "charts";
+			var soundsPath = modsPath + sep + "sounds";
+			var artPath = modsPath + sep + "art";
 			
 			createIfNotExists(chartsPath);
 			createIfNotExists(soundsPath);
@@ -109,15 +120,26 @@ class ModManager
 	private static function createDirectoryRecursive(path:String):Void
 	{
 		#if sys
-		var dirs = path.split(java.nio.file.FileSystems.getDefault().getSeparator());
+		var sep = getSeparator();
+		var dirs = path.split(sep);
 		var currentPath = "";
 		
 		for (dir in dirs)
 		{
-			if (dir == "")
+			if (dir == "" || dir == ".")
 				continue;
 			
-			currentPath += dir + java.nio.file.FileSystems.getDefault().getSeparator();
+			#if windows
+				if (currentPath == "")
+					currentPath = dir + sep;
+				else
+					currentPath += dir + sep;
+			#else
+				if (currentPath == "")
+					currentPath = sep + dir;
+				else
+					currentPath += sep + dir;
+			#end
 			
 			if (!FileSystem.exists(currentPath))
 			{
@@ -163,7 +185,7 @@ class ModManager
 
 		try
 		{
-			var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+			var sep = getSeparator();
 			var modPath = modsPath + sep + modName;
 			
 			if (FileSystem.exists(modPath))
@@ -217,7 +239,8 @@ class ModManager
 			}
 			
 			var modFolders = FileSystem.readDirectory(modsPath);
-			var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+			var sep = getSeparator();
+			var count = 0;
 			
 			for (folder in modFolders)
 			{
@@ -235,6 +258,7 @@ class ModManager
 							var modData:ModData = Json.parse(json);
 							mods.set(folder, modData);
 							trace("[ModManager] ✓ Mod carregado: " + folder);
+							count++;
 						}
 						catch (e)
 						{
@@ -244,7 +268,7 @@ class ModManager
 				}
 			}
 			
-			trace("[ModManager] Total de mods: " + mods.size());
+			trace("[ModManager] Total de mods: " + count);
 		}
 		catch (e)
 		{
@@ -264,7 +288,7 @@ class ModManager
 
 		try
 		{
-			var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+			var sep = getSeparator();
 			var modPath = modsPath + sep + modName;
 			var chartsPath = modPath + sep + "charts";
 			var chartPath = chartsPath + sep + chartName + ".json";
@@ -318,7 +342,7 @@ class ModManager
 				return null;
 			}
 
-			var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+			var sep = getSeparator();
 			var chartPath = modsPath + sep + modName + sep + "charts" + sep + chartName + ".json";
 			
 			if (!FileSystem.exists(chartPath))
@@ -353,7 +377,7 @@ class ModManager
 				return false;
 			}
 
-			var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+			var sep = getSeparator();
 			var chartPath = modsPath + sep + modName + sep + "charts" + sep + chartName + ".json";
 			
 			if (FileSystem.exists(chartPath))
@@ -408,7 +432,7 @@ class ModManager
 		#if sys
 		try
 		{
-			var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+			var sep = getSeparator();
 			var modPath = modsPath + sep + modName;
 			var json = Json.stringify(modData, null, "  ");
 			File.saveContent(modPath + sep + "mod.json", json);
@@ -423,25 +447,25 @@ class ModManager
 	
 	public static function getModPath(modName:String):String
 	{
-		var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+		var sep = getSeparator();
 		return modsPath + sep + modName;
 	}
 	
 	public static function getChartsPath(modName:String):String
 	{
-		var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+		var sep = getSeparator();
 		return modsPath + sep + modName + sep + "charts";
 	}
 	
 	public static function getSoundsPath(modName:String):String
 	{
-		var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+		var sep = getSeparator();
 		return modsPath + sep + modName + sep + "sounds";
 	}
 	
 	public static function getArtPath(modName:String):String
 	{
-		var sep = java.nio.file.FileSystems.getDefault().getSeparator();
+		var sep = getSeparator();
 		return modsPath + sep + modName + sep + "art";
 	}
 	
