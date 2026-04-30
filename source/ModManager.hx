@@ -280,9 +280,10 @@ class ModManager
 			
 			for (file in files)
 			{
-				if (file.endsWith(".json"))
+				if (StringTools.endsWith(file, ".json"))
 				{
-					charts.push(file.substring(0, file.length - 5));
+					var chartName = file.substr(0, file.length - 5);
+					charts.push(chartName);
 				}
 			}
 			
