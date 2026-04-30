@@ -996,7 +996,7 @@ class ChartingState extends MusicBeatState
 			{
 				if (FlxG.keys.justPressed.RIGHT #if mobile || vPad.buttonRight.justPressed #end || FlxG.keys.justPressed.D)
 					changeSection(curSection + shiftThing);
-				if (FlxG.keys.justPressed.LEFT #if mobile || vPad.buttonRight.justPressed #end || FlxG.keys.justPressed.A)
+				if (FlxG.keys.justPressed.LEFT #if mobile || vPad.buttonLeft.justPressed #end || FlxG.keys.justPressed.A)
 					changeSection(curSection - shiftThing);
 			}	
 			if (FlxG.keys.justPressed.SPACE #if mobile || vPad.buttonC.justPressed #end)

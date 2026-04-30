@@ -41,29 +41,29 @@ class ModManager
 			trace("[ModManager] Sistema já foi inicializado!");
 			return;
 		}
-
+	
 		try
 		{
 			#if android
-				var appData = "/storage/emulated/0/Android/data/com.example.kadeengine";
-				modsPath = appData + "/.Kadesh/mods";
-				savesPath = appData + "/saves";
-				chartsPath = savesPath + "/charts";
+				// Usa a pasta pública direto no emulated/0 após permissão
+				modsPath = "/storage/emulated/0/.Kadesh/mods";
+				savesPath = "/storage/emulated/0/.Kadesh/saves";
+				chartsPath = "/storage/emulated/0/.Kadesh/saves/charts";
 			#elseif ios
 				var docsDir = lime.system.System.documentsDirectory;
 				modsPath = docsDir + ".Kadesh/mods";
-				savesPath = docsDir + "saves";
-				chartsPath = savesPath + "/charts";
+				savesPath = docsDir + ".Kadesh/saves";
+				chartsPath = docsDir + ".Kadesh/saves/charts";
 			#elseif sys
 				var sep = getSeparator();
 				var appDir = Sys.getCwd();
 				modsPath = appDir + ".Kadesh" + sep + "mods";
-				savesPath = appDir + "saves";
-				chartsPath = savesPath + sep + "charts";
+				savesPath = appDir + ".Kadesh" + sep + "saves";
+				chartsPath = appDir + ".Kadesh" + sep + "saves" + sep + "charts";
 			#else
 				modsPath = ".Kadesh/mods";
-				savesPath = "saves";
-				chartsPath = "saves/charts";
+				savesPath = ".Kadesh/saves";
+				chartsPath = ".Kadesh/saves/charts";
 			#end
 			
 			trace("[ModManager] Caminho dos mods: " + modsPath);
