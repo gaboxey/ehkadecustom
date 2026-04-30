@@ -86,6 +86,13 @@ class Main extends Sprite
 	var game:FlxGame;
 
 	var fpsCounter:FPS;
+	
+	#if android
+	private function requestAndroidPermissions():Void
+	{
+		fpsCounter.visible = true;
+	}
+	#end
 
 	public function toggleFPS(fpsEnabled:Bool):Void {
 		fpsCounter.visible = fpsEnabled;
