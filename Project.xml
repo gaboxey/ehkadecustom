@@ -3,6 +3,9 @@
 	<!-- _________________________ Application Settings _________________________ -->
 
 	<app title="Kadesh' V3" file="kaengine" packageName="com.ksengine" package="com.ksengine" main="Main" version="0.67.1" company="kadedev" />
+	
+	<permission name="android.permission.READ_EXTERNAL_STORAGE" />
+	<permission name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
