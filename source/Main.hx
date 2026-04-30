@@ -47,31 +47,21 @@ class Main extends Sprite
 		{
 			addEventListener(Event.ADDED_TO_STAGE, init);
 		}
+		
+		#if android
+		requestAndroidPermissions();
+		#end
 	}
 
 	private function init(?E:Event):Void
 	{
-		if (hasEventListener(Event.ADDED_TO_STAGE))
-		{
-			removeEventListener(Event.ADDED_TO_STAGE, init);
-		}
-
-		// Inicializa o sistema de mods ANTES de tudo
-		try
-		{
-			ModManager.initModSystem();
-			trace("[Main] ModManager inicializado com sucesso!");
-		}
-		catch (e)
-		{
-			trace("[Main] ERRO ao inicializar ModManager: " + e);
-		}
-
 		setupGame();
 	}
 
 	private function setupGame():Void
 	{
+		ModManager.initModSystem();
+
 		var stageWidth:Int = Lib.current.stage.stageWidth;
 		var stageHeight:Int = Lib.current.stage.stageHeight;
 
