@@ -37,6 +37,11 @@ import openfl.media.Sound;
 import openfl.net.FileReference;
 import openfl.utils.ByteArray;
 
+#if sys
+import sys.io.File;
+import sys.FileSystem;
+#end
+
 using StringTools;
 
 class ChartingState extends MusicBeatState
@@ -242,7 +247,20 @@ class ChartingState extends MusicBeatState
 
 		var saveButton:FlxButton = new FlxButton(110, 8, "Save", function()
 		{
-			saveLevel();
+		    saveLevel();
+		    if (ModManager.initialized)
+		    {
+		        var chartData:ModManager.ChartData = {
+		            songName: _song.song,
+		            songDiff: 0,
+		            songSpeed: _song.speed,
+		            notes: _song.notes[curSection].sectionNotes,
+		            bpm: _song.bpm,
+		            events: []
+		        };
+		        ModManager.saveChartEditor(_song.song, chartData);
+		        trace("[ChartEditor] ✓ Chart salvo no ModManager!");
+		    }
 		});
 
 		var reloadSong:FlxButton = new FlxButton(saveButton.x + saveButton.width + 10, saveButton.y, "Reload Audio", function()
@@ -1584,5 +1602,30 @@ class ChartingState extends MusicBeatState
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 		_file = null;
 		FlxG.log.error("Problem saving Level data");
+	}
+	
+	public function loadChartModManager(chartName:String):Void
+	{
+	    if (ModManager.initialized)
+	    {
+	        var loaded = ModManager.loadChartEditor(chartName);
+	        if (loaded != null)
+	        {
+	            trace("[ChartEditor] ✓ Chart carregado do ModManager: " + chartName);
+	        }
+	        else
+	        {
+	            trace("[ChartEditor] ✗ Erro ao carregar chart!");
+	        }
+	    }
+	}
+	
+	public function getAvailableCharts():Array<String>
+	{
+	    if (ModManager.initialized)
+	    {
+	        return ModManager.listChartsEditor();
+	    }
+	    return [];
 	}
 }
